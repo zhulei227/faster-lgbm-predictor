@@ -1,7 +1,7 @@
 """
 对于单列预测值
 """
-import math
+import numpy as np
 
 
 class FasterLgbmSinglePredictor(object):
@@ -46,7 +46,7 @@ class FasterLgbmSinglePredictor(object):
         if "sigmoid" in self.model["objective"]:
             score = MathUtils.sigmoid(score)
         elif self.model["objective"] in ["tweedie", "poisson"]:
-            score = math.exp(score)
+            score = np.exp(score)
         rst.pop("_predict_value")
         rst.pop("_bias")
         return {"score": score, "contrib": rst}
@@ -144,8 +144,11 @@ class TreeCache(object):
 
     @staticmethod
     def decision(data: float, threshold: float, default_left: bool):
-        if data is None and default_left is True:
-            return "left_child"
+        if data is None or data is np.nan:
+            if default_left is True:
+                return "left_child"
+            else:
+                return "right_child"
         elif data <= threshold:
             return "left_child"
         else:
@@ -166,4 +169,4 @@ class TreeCache(object):
 class MathUtils(object):
     @staticmethod
     def sigmoid(x):
-        return 1 / (1 + math.exp(-1 * x))
+        return 1 / (1 + np.exp(-1 * x))

@@ -42,7 +42,7 @@ class FasterLgbmMulticlassPredictor(object):
             # softmax
             total_value = 0
             for key, value in score.items():
-                value = math.exp(value)
+                value = np.exp(value)
                 total_value += value
                 score[key] = value
             for key, value in score.items():
